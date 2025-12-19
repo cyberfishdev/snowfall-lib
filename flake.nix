@@ -14,22 +14,25 @@
     };
   };
 
-  outputs = inputs: let
+  outputs = {
+    self,
+    ...
+  } @ inputs: let
     core-inputs =
       inputs
       // {
-        src = ./.;
+        src = self;
       };
 
     # Create the library, extending the nixpkgs library and merging
     # libraries from other inputs to make them available like
     # `lib.flake-utils-plus.mkApp`.
-    # Usage: mkLib { inherit inputs; src = ./.; }
+    # Usage: mkLib { inherit inputs; src = self; }
     #   result: lib
     mkLib = import ./snowfall-lib core-inputs;
 
     # A convenience wrapper to create the library and then call `lib.mkFlake`.
-    # Usage: mkFlake { inherit inputs; src = ./.; ... }
+    # Usage: mkFlake { inherit inputs; src = self; ... }
     #   result: <flake-outputs>
     mkFlake = flake-and-lib-options @ {
       inputs,
@@ -69,8 +72,8 @@
       raw-config = config;
 
       config = {
-        root = ./.;
-        src = ./.;
+        root = self;
+        src = self;
         namespace = "snowfall";
         lib-dir = "snowfall-lib";
 
@@ -82,7 +85,7 @@
 
       internal-lib = let
         lib = mkLib {
-          src = ./.;
+          src = self;
 
           inputs =
             inputs
